@@ -9,7 +9,7 @@ variable "AUTH_URL" {}
 variable "REGION" {}
 # others
 variable "KEY_PAIR" {}
-variable "subnetwork_cidr" {
+variable "subnetwork_cidr" { # where do i put this???
   type    = string
   default = "192.168.4.0/24"
 }
@@ -24,32 +24,10 @@ variable "key_name" {
   default = "Please export an environment variable called TF_VAR_key_name with the name of the key that Terraform should use to build the server among the keys you have in cscloud."
 }
 
-variable "identity_file" {
+variable "identity_file" { ## ask teacher,where put this
   type    = string
   default = "Please export an environment variable TF_VAR_identity_file with the path to your key for ansible machine. This enables the ansible part to work."
 }  
-
-
-
-/*provider "openstack" {
-  user_name   = var.USERNAME
-  tenant_name = var.TENANT_NAME
-  password    = var.PASSWORD
-  auth_url    = var.AUTH_URL
-}
-
-resource "openstack_compute_instance_v2" "example" {
-  name            = var.NAME
-  image_name      = var.IMAGE_NAME
-  flavor_name     = var.FLAVOR_NAME
-  key_pair        = var.KEY_PAIR
-  security_groups = ["default"]
-
-  network {
-    name = var.NETWORK
-  }
-}*/
-
 
 ## delete later
 # Define required providers
@@ -124,8 +102,8 @@ resource "openstack_compute_instance_v2" "instance_1" {
 resource "openstack_compute_instance_v2" "basic" {
   name            = "basic"
   image_id        = "ad091b52-742f-469e-8f3c-fd81cadf0743"
-  flavor_id       = "3"
-  key_pair        = "my_key_pair_name"
+  flavor_id       = var.flavor_id
+  key_pair        = var.KEY_PAIR
   security_groups = ["default"]
 
   metadata = {
@@ -152,5 +130,5 @@ resource "local_file" "AnsibleInventory" {
   [webservers]
   ${openstack_compute_instance_v2.basic.access_ip_v4}
   EOF
-  filename = "${path.module}/inventory.ini"
+  filename = "ansible/inventory/hosts.ini"
 }
