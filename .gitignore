@@ -1,5 +1,6 @@
 terraform.tfvars
 variables.tf
+.terraform.lock.hcl
 .env
 
 # Local .terraform directories
