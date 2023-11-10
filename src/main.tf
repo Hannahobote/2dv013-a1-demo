@@ -1,14 +1,28 @@
 #Some variables 
-
 #TODO: move variables later
+variable "USERNAME" {
+  type = string
+}
 
-variable "USERNAME" {}
-variable "TENANT_NAME" {}
-variable "PASSWORD" {}
-variable "AUTH_URL" {}
-variable "REGION" {}
-# others
-variable "KEY_PAIR" {}
+variable "TENANT_NAME" {
+  type = string
+}
+
+variable "PASSWORD" {
+  type = string
+}
+
+variable "AUTH_URL" {
+  type = string
+}
+
+variable "REGION" {
+  type = string
+}
+
+variable "KEY_PAIR" {
+  type = string
+}
 variable "subnetwork_cidr" { # where do i put this???
   type    = string
   default = "192.168.4.0/24"
@@ -29,7 +43,6 @@ variable "identity_file" { ## ask teacher,where put this
   default = "Please export an environment variable TF_VAR_identity_file with the path to your key for ansible machine. This enables the ansible part to work."
 }  
 
-## delete later
 # Define required providers
 terraform {
 required_version = ">= 0.14.0"
@@ -117,7 +130,8 @@ resource "openstack_compute_instance_v2" "basic" {
 
 # compute_floatingip
 resource "openstack_networking_floatingip_v2" "fip_1" {
-  pool = "my_pool"
+  pool = "public"
+  subnet_id = var.subnetwork_cidr
 }
 
 resource "openstack_compute_floatingip_associate_v2" "fip_1" {
@@ -130,5 +144,5 @@ resource "local_file" "AnsibleInventory" {
   [webservers]
   ${openstack_compute_instance_v2.basic.access_ip_v4}
   EOF
-  filename = "ansible/inventory/hosts.ini"
+  filename = "ansible/inventory/hosts.ini" ##change this
 }
