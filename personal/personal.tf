@@ -58,7 +58,7 @@ resource "openstack_networking_router_interface_v2" "router_interface_1" {
 }
 
 resource "openstack_compute_instance_v2" "instance_1" {
-  name            = "instance_2"
+  name            = "instance_1"
   image_name      = "Ubuntu server 22.04.1"
   # flavor_id       = "c1-r1-d10"
   flavor_name     = "c1-r1-d10"
@@ -83,8 +83,16 @@ resource "openstack_compute_floatingip_associate_v2" "fip_1" {
 resource "local_file" "AnsibleInventory" {
   content = <<-EOF
   [webservers]
-  ${openstack_compute_instance_v2.basic.access_ip_v4}
+  ${openstack_compute_instance_v2.instance_1.access_ip_v4}
   EOF
-  filename = "ansible/inventory/hosts.ini" ##change this
+  filename = "ansible/hosts.ini" ##change this
+}
+
+output "fixed_ip_v4" {
+  value = openstack_compute_instance_v2.instance_1.network[1].fixed_ip_v4
+}
+
+output "floating_ip" {
+  value = openstack_compute_instance_v2.instance_1.network[0].floating_ip
 }
 
