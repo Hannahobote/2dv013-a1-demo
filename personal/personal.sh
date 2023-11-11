@@ -15,5 +15,5 @@ cd ansible
 
 # Run your Ansible playbook
 # ansible-playbook playbook.yml
-ansible-playbook -i hosts.ini playbook.yml
+ansible-playbook -i hosts.ini playbook.yml --extra-vars=ansible_ssh_private_key_file=../../../.ssh/ao223ir_key_ssh.pem
 

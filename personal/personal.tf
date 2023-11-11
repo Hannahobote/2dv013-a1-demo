@@ -62,9 +62,10 @@ resource "openstack_compute_instance_v2" "instance_1" {
   image_name      = "Ubuntu server 22.04.1"
   # flavor_id       = "c1-r1-d10"
   flavor_name     = "c1-r1-d10"
-  security_groups = ["default"]
+  # security_groups = ["default"]
+  security_groups = [ "default", "${openstack_networking_secgroup_v2.ssh.id}"]
   availability_zone = "Education"
-  key_pair        = "ao223ir_Keypair"
+  key_pair        = "ao223ir_keypair"
 
   network {
     uuid = openstack_networking_network_v2.network_1.id
@@ -80,19 +81,36 @@ resource "openstack_compute_floatingip_associate_v2" "fip_1" {
   instance_id = openstack_compute_instance_v2.instance_1.id
 }
 
+# SECURITY GROUPS ------------
+
+resource "openstack_networking_secgroup_v2" "ssh" {
+  name = "ssh"
+  description = "Security group for SSH"
+}
+
+resource "openstack_networking_secgroup_rule_v2" "ssh_rule" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 22
+  port_range_max    = 22
+  remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = "${openstack_networking_secgroup_v2.ssh.id}"
+}
+
 resource "local_file" "AnsibleInventory" {
   content = <<-EOF
   [webservers]
   ${openstack_compute_instance_v2.instance_1.access_ip_v4}
+  ${openstack_networking_floatingip_v2.fip_1.address}
   EOF
-  filename = "ansible/hosts.ini" ##change this
+  filename = "ansible/hosts.ini"
 }
 
-output "fixed_ip_v4" {
-  value = openstack_compute_instance_v2.instance_1.network[1].fixed_ip_v4
+/*output "network" {
+  value = openstack_compute_instance_v2.instance_1.network
 }
 
 output "floating_ip" {
-  value = openstack_compute_instance_v2.instance_1.network[0].floating_ip
-}
-
+ value = openstack_networking_floatingip_v2.fip_1.address
+}*/
